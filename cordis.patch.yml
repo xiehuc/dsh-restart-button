@@ -1,0 +1,6 @@
+# dsh-restart-button bundle patch.
+# Installed via `dsh plugin --profile web add ...`; auto-mounts the plugin
+# without manually editing cordis.patch.yml.
+- insert:
+    - id: restart-button
+      name: dsh-restart-button

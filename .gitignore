@@ -1,32 +1,17 @@
 # Dependencies
 node_modules/
+.pnpm-store/
 
-# Build output (should be in repo for npm, but ignore for dev)
-lib/
+# Build / local artifacts
+*.tgz
+*.log
+npm-debug.log*
 
 # Environment variables
 .env
 .env.local
 .env.*.local
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-
 # OS
 .DS_Store
 Thumbs.db
-
-# Logs
-*.log
-npm-debug.log*
-
-# Temporary files
-tmp/
-temp/
-
-# pnpm-lock.yaml if you want to commit package.json but not lock file
-# pnpm-lock.yaml

@@ -4,12 +4,12 @@
   "description": "DSH Web plugin: adds a restart button in the General settings panel that restarts the whole DeepSeek Harness service.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/restart-button-pkg.git"
+    "url": "git+https://github.com/xiehuc/dsh-restart-button.git"
   },
   "bugs": {
-    "url": "https://github.com/YOUR_USERNAME/restart-button-pkg/issues"
+    "url": "https://github.com/xiehuc/dsh-restart-button/issues"
   },
-  "homepage": "https://github.com/YOUR_USERNAME/restart-button-pkg#readme",
+  "homepage": "https://github.com/xiehuc/dsh-restart-button#readme",
   "keywords": [
     "dsh",
     "deepseek",
@@ -19,13 +19,8 @@
     "agent",
     "ai"
   ],
-  "author": "YOUR_NAME <your.email@example.com>",
-  "maintainers": [
-    {
-      "name": "YOUR_NAME",
-      "email": "your.email@example.com"
-    }
-  ],
+  "license": "MIT",
+  "author": "xiehuc",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -50,10 +45,8 @@
     "README.md",
     "LICENSE"
   ],
-  "license": "MIT",
+  "sideEffects": false,
   "scripts": {
-    "prepare": "echo 'Build artifacts already included in lib/'",
-    "publish": "npm publish",
     "pack": "npm pack"
   }
 }

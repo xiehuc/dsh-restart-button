@@ -1,6 +1,6 @@
 {
   "name": "dsh-restart-button",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "DSH Web plugin: adds a restart button in the General settings panel that restarts the whole DeepSeek Harness service.",
   "repository": {
     "type": "git",

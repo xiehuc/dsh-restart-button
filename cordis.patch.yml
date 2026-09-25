@@ -4,3 +4,11 @@
 - insert:
     - id: restart-button
       name: dsh-restart-button
+      # Origins allowed to trigger a restart through a reverse proxy, on top of
+      # the same-origin rule. Same as lib/index.js's DEFAULT_ALLOWED_ORIGINS;
+      # this entry wins when present. Caddy serves the UI on 28010 and
+      # proxy_passes to 28000, and the X-Forwarded-* headers Caddy adds would
+      # otherwise make every click through it a 403.
+      config:
+        allowedOrigins:
+          - http://192.168.1.7:28010

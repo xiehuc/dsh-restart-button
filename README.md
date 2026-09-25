@@ -7,7 +7,8 @@
 - 🔄 **一键重启**:在“常规设置”面板点击按钮即可重启整个 DSH 服务
 - 🔒 **安全设计**:
   - 仅限同源请求(防止 CSRF)
-  - 拒绝代理转发头
+  - 可用 `allowedOrigins` 显式放行反向代理入口(如 Caddy `28010 → 28000`)
+  - 未列入白名单的请求仍拒绝代理转发头
   - 避免重复重启(409 Conflict)
 - 🚀 **平滑重启**:
   - 主进程优雅退出,释放端口
@@ -40,9 +41,10 @@ dsh plugin --profile web add github:xiehuc/dsh-restart-button
 
 ### 主机端(Host)
 
-- `lib/index.js`:暴露 `apply(ctx)`,注册两个 HTTP 路由:
-  - `POST /dsh-restart` —— 触发重启(带同源 CSRF 校验)
+- `lib/index.js`:暴露 `apply(ctx, config)`,注册两个 HTTP 路由:
+  - `POST /dsh-restart` —— 触发重启(同源 CSRF 校验 + `allowedOrigins` 白名单)
   - `GET /dsh-restart/status` —— 返回 `{ pid, startedAt }`
+- 配置通过 `export const Config`(Standard Schema)声明,由 cordis 在插件启动前校验后传入 `apply`。
 - 重启交给 detach、unref 的辅助进程,它等待端口释放后执行 **`/var/apps/dsh/cmd/main restart`**(本机 fnOS 生命周期重启),随后验证端口重新被监听。
 
 ### 客户端(Client)
@@ -60,6 +62,36 @@ const RESTART_CMD = '/var/apps/dsh/cmd/main' // 你的重启命令(绝对路径)
 const RESTART_ARGS = ['restart']             // 参数
 const DEFAULT_PORT = 28000                   // 兜底端口
 ```
+
+### 反向代理(allow origin)
+
+`POST /dsh-restart` 默认只接受同源请求(`Origin` 的主机 === `Host`),并且会拒绝带
+`X-Forwarded-For` / `Forwarded` / `X-Real-IP` 的请求 —— 也就是说**在反向代理后面默认点不动**。
+Caddy 的 `reverse_proxy` 默认就会给上游追加这几个头,于是表现为:
+
+```
+POST http://192.168.1.7:28010/dsh-restart → 403
+restart is limited to same-origin requests
+```
+
+把前端入口写进 `allowedOrigins` 即可放行(匹配 scheme + host,裸写 `host:port` 按 http 处理):
+
+```yaml
+# cordis.patch.yml
+- insert:
+    - id: restart-button
+      name: dsh-restart-button
+      config:
+        allowedOrigins:
+          - http://192.168.1.7:28010
+```
+
+未配置时回退到 `lib/index.js` 的 `DEFAULT_ALLOWED_ORIGINS`(本机默认已含
+`http://192.168.1.7:28010`)。只有列出的 origin 会绕过转发头规则,跨站页面伪造的
+`Origin` 依然会被拒。
+
+> 走代理时 `Host` 是前端端口(如 Caddy 的 28010),而 28010 是代理自己监听的、永远不会关闭,
+> 所以检测“本地端口是否已释放”时这类请求会回退到 `DEFAULT_PORT`,而不是去探代理端口。
 
 ## 🛠 本地开发
 
